@@ -32,14 +32,15 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).select('+password');
+    let user = await User.findOne({ email }).select('+password');
     const result = await User.comparePasssword(password, user.password);
-
+    user.password = undefined;
     if (result) {
       return res.status(200).json({
         status: 'success',
         message:'User logged in successfully.',
-        token: await token(user._id)
+        token: await token(user._id),
+        user
       })
     } else {
       return res.status(200).json({
